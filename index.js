@@ -47,25 +47,33 @@ function ehf(hex) {
     }
     return hex;
 }
-function createSVGArc(arcNum, numArcs) {
+function createSVGArc(arcNum, numArcs, name) {
+    var arc;
     var startAngle = (Math.PI * 2 / numArcs) * arcNum;
     var endAngle = (Math.PI * 2 / numArcs) * (arcNum + 1);
-    return "<path d=\"M50,50 l".concat(Math.cos(startAngle) * 50, " ").concat(Math.sin(startAngle) * 50, " A50,50 0 0,1 ").concat((1 + Math.cos(endAngle)) * 50, ",").concat((1 + Math.sin(endAngle)) * 50, " z\"\nfill=\"").concat(hueToHex((startAngle + endAngle) / 2), "\" stroke=\"black\" stroke-width=\"1px\"/>");
+    if (numArcs === 1) {
+        arc = "<circle cx=\"50\" cy=\"50\" r=\"50\" stroke=\"black\" stroke-width=\"1px\" fill=\"red\" />";
+    }
+    else {
+        arc = "<path d=\"M50,50 l".concat(Math.cos(startAngle) * 50, " ").concat(Math.sin(startAngle) * 50, " A50,50 0 0,1 ").concat((1 + Math.cos(endAngle)) * 50, ",").concat((1 + Math.sin(endAngle)) * 50, " z\"\nfill=\"").concat(hueToHex((startAngle + endAngle) / 2), "\" stroke=\"black\" stroke-width=\"1px\"/>");
+    }
+    arc += "<text x=\"97\" y=\"50\" fill=\"white\" transform=\"rotate(".concat((startAngle + endAngle) * 90 / Math.PI, " 50,50)\" text-anchor=\"end\" dominant-baseline=\"central\" font-size=\"10px\">").concat(name, "</text>");
+    return arc;
 }
 function createSVGArcs(movies) {
-    var arcs = '';
+    var arcs = '<circle cx="50" cy="50" r="50" stroke="black" stroke-width="1px" fill="black" />';
     for (var i = 0; i < movies.length; i++) {
-        arcs += createSVGArc(i, movies.length);
+        arcs += createSVGArc(i, movies.length, movies[i].name);
     }
     return arcs;
 }
-var defaultMovies = [{ name: "", runtime: 0, genres: [] }, { name: "", runtime: 0, genres: [] }];
 function updateNumMovies(event) {
     defaultMovies = [];
     for (var i = 0; i < event.target.value; i++) {
-        defaultMovies.push({ name: "", runtime: i, genres: [] });
+        defaultMovies.push({ name: "".concat(i), runtime: i, genres: [] });
     }
     document.getElementById("wheel").innerHTML = createSVGArcs(defaultMovies);
 }
+var defaultMovies = [];
 document.getElementById("numMovies").addEventListener("input", updateNumMovies);
 document.getElementById("wheel").innerHTML = createSVGArcs(defaultMovies);

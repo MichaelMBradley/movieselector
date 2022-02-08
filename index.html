@@ -8,27 +8,35 @@
 <body>
 <h1>Movie Selector</h1>
 <div id="svg-container">
-	<svg width="100%" height="100%" id="wheel" viewBox="-5 -5 110 110" preserveAspectRatio="none"></svg>
+	<svg width="100%" height="100%" id="wheel" viewBox="-5 -5 110 110" preserveAspectRatio="none">
+
+	</svg>
 </div>
 <div id="controls">
 	<h3>Select movie length</h3>
 	<div class="controlSection">
-		<label for="minTime">Minimum movie length:</label><br>
-		<input type="range" min="0" max="300" value="0" id="minTime"><br>
-		<label for="minTime">Maximum movie length:</label><br>
-		<input type="range" min="0" max="300" value="300" id="maxTime"><br>
+		<label for="minTime">Minimum movie length: <span id="min" class="time">0h00m</span></label><br>
+		<input type="range" min="0" max="16" value="0" id="minTime"><br>
+		<label for="maxTime">Maximum movie length: <span id="max" class="time">4h00m</span></label><br>
+		<input type="range" min="0" max="16" value="300" id="maxTime"><br>
 	</div>
 	<h3>Select genres</h3>
+	<div class="controlSection">
+		<input type="radio" name="inEx" id="include" checked>
+		<label for="include">Include</label>
+		<input type="radio" name="inEx" id="exclude">
+		<label for="exclude">Exclude</label>
+	</div>
 	<div class="controlSection" id="genre">
-		<input type="checkbox" id="example1" checked>
+		<input type="checkbox" id="example1">
 		<label for="example1">Example genre 1</label><br>
-		<input type="checkbox" id="example2" checked>
+		<input type="checkbox" id="example2">
 		<label for="example2">Example genre 2</label><br>
 	</div>
 	<h3>Other</h3>
 	<div class="controlSection">
 		<label for="numMovies">Number of movies</label><br>
-		<input type="range" min="2" max="360" value="5" id="numMovies"><br>
+		<input type="range" min="0" max="30" value="0" id="numMovies"><br>
 	</div>
 </div>
 </body>

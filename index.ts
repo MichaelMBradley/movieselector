@@ -41,30 +41,37 @@ function ehf(hex: string): string {
 	return hex;
 }
 
-function createSVGArc(arcNum: number, numArcs: number): string {
+function createSVGArc(arcNum: number, numArcs: number, name: string): string {
+	let arc: string;
 	let startAngle: number = (Math.PI * 2 / numArcs) * arcNum;
 	let endAngle: number = (Math.PI * 2 / numArcs) * (arcNum + 1);
-	return `<path d="M50,50 l${Math.cos(startAngle) * 50} ${Math.sin(startAngle) * 50} A50,50 0 0,1 ${(1 + Math.cos(endAngle)) * 50},${(1 + Math.sin(endAngle)) * 50} z"
+	if(numArcs === 1) {
+		arc = `<circle cx="50" cy="50" r="50" stroke="black" stroke-width="1px" fill="red" />`;
+	} else {
+		arc = `<path d="M50,50 l${Math.cos(startAngle) * 50} ${Math.sin(startAngle) * 50} A50,50 0 0,1 ${(1 + Math.cos(endAngle)) * 50},${(1 + Math.sin(endAngle)) * 50} z"
 fill="${hueToHex((startAngle + endAngle) / 2)}" stroke="black" stroke-width="1px"/>`;
+	}
+	arc += `<text x="97" y="50" fill="white" transform="rotate(${(startAngle + endAngle) * 90 / Math.PI} 50,50)" text-anchor="end" dominant-baseline="central" font-size="10px">${name}</text>`
+	return arc;
 }
 
 function createSVGArcs(movies: movie[]): string {
-	let arcs: string = '';
+	let arcs: string = '<circle cx="50" cy="50" r="50" stroke="black" stroke-width="1px" fill="black" />';
 	for(let i = 0; i < movies.length; i++) {
-		arcs += createSVGArc(i, movies.length);
+		arcs += createSVGArc(i, movies.length, movies[i].name);
 	}
 	return arcs;
 }
 
-let defaultMovies: movie[] = [{name:"",runtime:0,genres:[]},{name:"",runtime:0,genres:[]}];
-
 function updateNumMovies(event): void {
 	defaultMovies = [];
 	for(let i = 0; i < event.target.value; i++) {
-		defaultMovies.push({name:"",runtime:i,genres:[]})
+		defaultMovies.push({name:`${i}`,runtime:i,genres:[]})
 	}
 	document.getElementById("wheel").innerHTML = createSVGArcs(defaultMovies);
 }
+
+let defaultMovies: movie[] = [];
 
 document.getElementById("numMovies").addEventListener("input", updateNumMovies)
 document.getElementById("wheel").innerHTML = createSVGArcs(defaultMovies);
