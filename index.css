@@ -1,3 +1,49 @@
+html {
+  background: rgb(80,58,180);
+  background: linear-gradient(90deg, rgba(80,58,180,1) 0%, rgba(145,50,255,1) 50%, rgba(80,58,180,1) 100%);
+}
 
+body {
+  text-align: center;
+}
 
-/*# sourceMappingURL=index.css.map */
+h1, h3 {
+  color: white;
+  font-family: sans-serif;
+  text-align: center;
+  text-shadow: 0 0 10px white;
+}
+
+label {
+  color: white;
+  font-family: sans-serif;
+}
+
+div {
+  display: inline-block;
+}
+
+div#svg-container {
+  width: 40%;
+  display: inline-block;
+}
+
+div#controls {
+  width: 30%;
+  background-color: purple;
+  border-radius: 1em;
+  display: inline-block;
+  vertical-align: top;
+}
+
+div.controlSection{
+  border-radius: 0.75em;
+  padding: 0.75em;
+  margin: 0.25em;
+  background-color: darkviolet;
+  display: block;
+}
+
+div#genre {
+  text-align: left;
+}
