@@ -1,5 +1,51 @@
+// Assumes hue in radians, s=1, v=1
 function hueToHex(hue) {
-    return "red";
+    // number.toString(16);
+    hue = hue * 3 / Math.PI;
+    var f = hue % 1;
+    var r, g, b;
+    switch (Math.floor(hue) % 6) {
+        case 0:
+            r = 1;
+            g = f;
+            b = 0;
+            break;
+        case 1:
+            r = 1 - f;
+            g = 1;
+            b = 0;
+            break;
+        case 2:
+            r = 0;
+            g = 1;
+            b = f;
+            break;
+        case 3:
+            r = 0;
+            g = 1 - f;
+            b = 1;
+            break;
+        case 4:
+            r = f;
+            g = 0;
+            b = 1;
+            break;
+        case 5:
+            r = 1;
+            g = 0;
+            b = 1 - f;
+            break;
+    }
+    r *= 255;
+    g *= 255;
+    b *= 255;
+    return "#".concat(ehf(parseInt(r).toString(16))).concat(ehf(parseInt(g).toString(16))).concat(ehf(parseInt(b).toString(16)));
+}
+function ehf(hex) {
+    if (hex.length === 1) {
+        return "0" + hex;
+    }
+    return hex;
 }
 function createSVGArc(arcNum, numArcs) {
     var startAngle = (Math.PI * 2 / numArcs) * arcNum;
@@ -13,9 +59,13 @@ function createSVGArcs(movies) {
     }
     return arcs;
 }
-var numDefaults = 5;
-var defaultMovies = [];
-for (var i = 0; i < numDefaults; i++) {
-    defaultMovies.push({ name: "m" + i, runtime: i, genres: ["g1", "g" + i] });
+var defaultMovies = [{ name: "", runtime: 0, genres: [] }, { name: "", runtime: 0, genres: [] }];
+function updateNumMovies(event) {
+    defaultMovies = [];
+    for (var i = 0; i < event.target.value; i++) {
+        defaultMovies.push({ name: "", runtime: i, genres: [] });
+    }
+    document.getElementById("wheel").innerHTML = createSVGArcs(defaultMovies);
 }
-document.getElementById("wheel").innerHTML += createSVGArcs(defaultMovies);
+document.getElementById("numMovies").addEventListener("input", updateNumMovies);
+document.getElementById("wheel").innerHTML = createSVGArcs(defaultMovies);

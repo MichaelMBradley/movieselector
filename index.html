@@ -8,9 +8,7 @@
 <body>
 <h1>Movie Selector</h1>
 <div id="svg-container">
-	<svg width="100%" height="100%" id="wheel" viewBox="-5 -5 110 110" preserveAspectRatio="none">
-		<ellipse cx="50" cy="50" rx="50" ry="50"/>
-	</svg>
+	<svg width="100%" height="100%" id="wheel" viewBox="-5 -5 110 110" preserveAspectRatio="none"></svg>
 </div>
 <div id="controls">
 	<h3>Select movie length</h3>
@@ -26,6 +24,11 @@
 		<label for="example1">Example genre 1</label><br>
 		<input type="checkbox" id="example2" checked>
 		<label for="example2">Example genre 2</label><br>
+	</div>
+	<h3>Other</h3>
+	<div class="controlSection">
+		<label for="numMovies">Number of movies</label><br>
+		<input type="range" min="2" max="360" value="5" id="numMovies"><br>
 	</div>
 </div>
 </body>

@@ -4,8 +4,41 @@ interface movie {
 	genres: string[];
 }
 
+// Assumes hue in radians, s=1, v=1
 function hueToHex(hue: number): string {
-	return "red";
+	// number.toString(16);
+	hue = hue * 3 / Math.PI;
+	let f = hue % 1;
+	let r,g,b;
+	switch(Math.floor(hue) % 6) {
+		case 0:
+			r = 1; g = f; b = 0;
+			break;
+		case 1:
+			r = 1-f; g = 1; b = 0;
+			break;
+		case 2:
+			r = 0; g = 1; b = f;
+			break;
+		case 3:
+			r = 0; g = 1-f; b = 1;
+			break;
+		case 4:
+			r = f; g = 0; b = 1;
+			break;
+		case 5:
+			r = 1; g = 0; b = 1-f;
+			break;
+	}
+	r *= 255; g *= 255; b *= 255;
+	return `#${ehf(parseInt(r).toString(16))}${ehf(parseInt(g).toString(16))}${ehf(parseInt(b).toString(16))}`;
+}
+
+function ehf(hex: string): string {
+	if(hex.length === 1) {
+		return "0" + hex;
+	}
+	return hex;
 }
 
 function createSVGArc(arcNum: number, numArcs: number): string {
@@ -22,10 +55,16 @@ function createSVGArcs(movies: movie[]): string {
 	}
 	return arcs;
 }
-let numDefaults: number = 5;
-let defaultMovies: movie[] = [];
-for(let i = 0; i < numDefaults; i++) {
-	defaultMovies.push({name: "m" + i, runtime: i, genres: ["g1", "g" + i]})
+
+let defaultMovies: movie[] = [{name:"",runtime:0,genres:[]},{name:"",runtime:0,genres:[]}];
+
+function updateNumMovies(event): void {
+	defaultMovies = [];
+	for(let i = 0; i < event.target.value; i++) {
+		defaultMovies.push({name:"",runtime:i,genres:[]})
+	}
+	document.getElementById("wheel").innerHTML = createSVGArcs(defaultMovies);
 }
 
-document.getElementById("wheel").innerHTML += createSVGArcs(defaultMovies);
+document.getElementById("numMovies").addEventListener("input", updateNumMovies)
+document.getElementById("wheel").innerHTML = createSVGArcs(defaultMovies);
