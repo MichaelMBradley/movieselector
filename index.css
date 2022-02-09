@@ -7,6 +7,10 @@ body {
 	text-align: center;
 }
 
+html, body {
+	height: 90%;
+}
+
 h1, h3 {
 	color: white;
 	font-family: sans-serif;
@@ -26,14 +30,21 @@ div {
 div#svg-container {
 	width: 40%;
 	display: inline-block;
+	max-width: 70%;
+	min-width: 13em;
 }
 
 div#controls {
 	width: 35%;
+	height: 100%;
 	background-color: purple;
 	border-radius: 1em;
 	display: inline-block;
 	vertical-align: top;
+	scroll-behavior: auto;
+	overflow-y: auto;
+	max-width: 20em;
+	min-width: 13em;
 }
 
 div.controlSection{
@@ -46,6 +57,7 @@ div.controlSection{
 
 div#genre {
 	text-align: left;
+	column-count: 2;
 }
 
 span.time {
@@ -54,4 +66,19 @@ span.time {
 	border-radius: 3px;
 	font-family: monospace;
 	font-size: 1.2em;
+}
+
+div::-webkit-scrollbar {
+	width: 20px;
+	border-radius: 1em;
+}
+
+div::-webkit-scrollbar-track {
+	background-color: purple;
+	border-radius: 1em;
+}
+
+div::-webkit-scrollbar-thumb {
+	background: darkviolet;
+	border-radius: 1em;
 }
