@@ -11,7 +11,7 @@ html, body {
 	height: 90%;
 }
 
-h1, h3 {
+h1, h2, h3 {
 	color: white;
 	font-family: sans-serif;
 	text-align: center;
@@ -23,19 +23,20 @@ label {
 	font-family: sans-serif;
 }
 
-div {
-	display: inline-block;
+div#content {
+	width: 100%;
+	column-count: 2;
+	display: block;
 }
 
 div#svg-container {
-	width: 40%;
+	width: 100%;
 	display: inline-block;
-	max-width: 70%;
 	min-width: 13em;
 }
 
 div#controls {
-	width: 35%;
+	width: 70%;
 	height: 100%;
 	background-color: purple;
 	border-radius: 1em;
@@ -81,4 +82,38 @@ div::-webkit-scrollbar-track {
 div::-webkit-scrollbar-thumb {
 	background: darkviolet;
 	border-radius: 1em;
+}
+
+div#newMovie {
+	text-align: left;
+}
+
+input[type="text"] {
+	width: 96%;
+}
+
+#runHours {
+	width: 0.7em;
+}
+
+#runMinutes {
+	width:1.7em;
+	text-align: right;
+	padding-right: 4px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+/* Firefox */
+input[type=number] {
+	-moz-appearance: textfield;
+}
+
+#saveNew {
+	align-self: end;
+	float: right;
 }

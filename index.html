@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
 	<meta charset="UTF-8">
 	<title>Movie Selector</title>
@@ -7,32 +7,55 @@
 </head>
 <body>
 <h1>Movie Selector</h1>
-<div id="svg-container">
-	<svg width="100%" height="100%" id="wheel" viewBox="-5 -5 110 110" preserveAspectRatio="none">
+<div id="content">
+	<div id="svg-container">
+		<h2 id="currentMovie">No movie selected</h2>
+		<svg viewBox="0 0 10 10" width="5%">
+			<polygon points="0,0 5,10 10,0" fill="white" />
+		</svg>
+		<svg width="100%" height="100%" id="wheel" viewBox="-5 -5 110 110" preserveAspectRatio="none">
 
-	</svg>
-</div>
-<div id="controls">
-	<h3>Select movie length</h3>
-	<div class="controlSection">
-		<label for="minTime">Minimum movie length: <span id="min" class="time">0h00m</span></label><br>
-		<input type="range" min="0" max="16" value="0" id="minTime"><br>
-		<label for="maxTime">Maximum movie length: <span id="max" class="time">4h00m</span></label><br>
-		<input type="range" min="0" max="16" value="16" id="maxTime"><br>
+		</svg>
 	</div>
-	<h3>Select genres</h3>
-	<div class="controlSection">
-		<input type="radio" name="inEx" id="include" checked>
-		<label for="include">Include</label>
-		<input type="radio" name="inEx" id="exclude">
-		<label for="exclude">Exclude</label>
-	</div>
-	<div class="controlSection" id="genre">
-	</div>
-	<h3>Other</h3>
-	<div class="controlSection">
-		<label for="numMovies">Number of movies</label><br>
-		<input type="range" min="0" max="30" value="0" id="numMovies"><br>
+	<div id="controls">
+		<h3>Select movie length</h3>
+		<div class="controlSection">
+			<label for="minTime">Minimum movie length: <span id="min" class="time">0h00m</span></label><br>
+			<input type="range" min="0" max="16" value="0" id="minTime"><br>
+			<label for="maxTime">Maximum movie length: <span id="max" class="time">∞h ∞m</span></label><br>
+			<input type="range" min="0" max="16" value="16" id="maxTime"><br>
+		</div>
+		<h3>Select genres</h3>
+		<div class="controlSection">
+			<input type="radio" name="inEx" id="include" checked>
+			<label for="include">Include</label>
+			<input type="radio" name="inEx" id="exclude">
+			<label for="exclude">Exclude</label>
+		</div>
+		<div class="controlSection" id="genre">
+		</div>
+		<h3>Add/edit movies</h3>
+		<div class="controlSection" id="newMovie">
+			<label for="name">Name:</label><br>
+			<input type="text" id="name"><br><br>
+			<label>Runtime:</label><br>
+			<input type="number" id="runHours">
+			<label for="runHours">h</label>
+			<input type="number" id="runMinutes">
+			<label for="runMinutes">m</label><br><br>
+			<label for="genreInput">Genres (space separated):</label><br>
+			<input type="text" id="genreInput"><br><br>
+			<label for="linkInput">Link:</label><br>
+			<input type="text" id="linkInput"><br><br>
+			<button id="save">Save</button>
+			<button id="saveNew">Save as new</button>
+
+		</div>
+		<h3>Other</h3>
+		<div class="controlSection">
+			<label for="numMovies">Number of movies</label><br>
+			<input type="range" min="0" max="30" value="0" id="numMovies"><br>
+		</div>
 	</div>
 </div>
 </body>
