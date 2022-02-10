@@ -21,7 +21,7 @@ function ensureLength(num: string | number, radix: number = 10, length: number =
 		}
 		return num;
 	} else {
-		return ensureLength(parseInt(num.toString()).toString(radix), radix, length);
+		return ensureLength(Math.floor(num).toString(radix), radix, length);
 	}
 }
 
@@ -36,7 +36,8 @@ function createSVGArcs(movies: movie[]): void {
 			arc = `<path d="M50,50 l${Math.cos(startAngle) * 50} ${Math.sin(startAngle) * 50} A50,50 0 0,1 ${(1 + Math.cos(endAngle)) * 50},${(1 + Math.sin(endAngle)) * 50} z"
 fill="${hueToHex((startAngle + endAngle) / 2)}" stroke="black" stroke-width="1px" id="${name}" />`;
 		}
-		arc += `<text x="97" y="50" fill="white" transform="rotate(${(startAngle + endAngle) * 90 / Math.PI} 50,50)" text-anchor="end" dominant-baseline="central" font-size="${20 / numArcs}px" id="${name}@@@text">${name}</text>`
+		// TODO: Use `document.createElement()`, and a better formula for the font size
+		arc += `<text x="97" y="50" fill="white" stroke="black" stroke-width="0.1px" font-family="sans-serif" transform="rotate(${(startAngle + endAngle) * 90 / Math.PI} 50,50)" text-anchor="end" dominant-baseline="central" font-size="${25 / numArcs}px" id="${name}@@@text">${name}</text>`
 		return arc;
 	}
 
@@ -102,11 +103,25 @@ function setGenres(movies: movie[]): void {
 }
 
 function arcClick(event): void {
-	document.getElementById("currentMovie").innerText = event.target.id.split("@@@")[0];//eventID;
+	currentMovie = defaultMovies.filter(movie => {return movie.name === event.target.id.split("@@@")[0]})[0];
+	loadMovieEditor();
 }
 
 function spinClick(): void {
 	document.getElementById("currentMovie").innerText = "Spinning!";
+}
+
+function loadMovieEditor(): void {
+	// @ts-ignore
+	document.getElementById("movieName").value = currentMovie.name;
+	// @ts-ignore
+	document.getElementById("runHours").value = Math.floor(currentMovie.runtime / 60);
+	// @ts-ignore
+	document.getElementById("runMinutes").value = currentMovie.runtime % 60;
+	// @ts-ignore
+	document.getElementById("genreInput").value = currentMovie.genres.join(" ");
+	// @ts-ignore
+	document.getElementById("linkInput").value = currentMovie.link;
 }
 
 function setup(): void {
@@ -129,7 +144,7 @@ function setup(): void {
 	document.getElementById("minTime").addEventListener("input", updateSliders);
 	document.getElementById("maxTime").addEventListener("input", updateSliders);
 
-
+	loadMovieEditor();
 }
 
 function updateNumMovies(event): void {
@@ -167,4 +182,7 @@ let defaultMovies: movie[] = [{
 	genres: ["Drama","Romance"],
 	link: "https://www.netflix.com"
 }];
-setup();
+
+let currentMovie = defaultMovies[0];
+
+window.onload = setup;

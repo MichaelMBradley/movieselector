@@ -16,7 +16,7 @@ function ensureLength(num, radix, length) {
         return num;
     }
     else {
-        return ensureLength(parseInt(num.toString()).toString(radix), radix, length);
+        return ensureLength(Math.floor(num).toString(radix), radix, length);
     }
 }
 function createSVGArcs(movies) {
@@ -30,7 +30,8 @@ function createSVGArcs(movies) {
         else {
             arc = "<path d=\"M50,50 l".concat(Math.cos(startAngle) * 50, " ").concat(Math.sin(startAngle) * 50, " A50,50 0 0,1 ").concat((1 + Math.cos(endAngle)) * 50, ",").concat((1 + Math.sin(endAngle)) * 50, " z\"\nfill=\"").concat(hueToHex((startAngle + endAngle) / 2), "\" stroke=\"black\" stroke-width=\"1px\" id=\"").concat(name, "\" />");
         }
-        arc += "<text x=\"97\" y=\"50\" fill=\"white\" transform=\"rotate(".concat((startAngle + endAngle) * 90 / Math.PI, " 50,50)\" text-anchor=\"end\" dominant-baseline=\"central\" font-size=\"").concat(20 / numArcs, "px\" id=\"").concat(name, "@@@text\">").concat(name, "</text>");
+        // TODO: Use `document.createElement()`, and a better formula for the font size
+        arc += "<text x=\"97\" y=\"50\" fill=\"white\" stroke=\"black\" stroke-width=\"0.1px\" font-family=\"sans-serif\" transform=\"rotate(".concat((startAngle + endAngle) * 90 / Math.PI, " 50,50)\" text-anchor=\"end\" dominant-baseline=\"central\" font-size=\"").concat(25 / numArcs, "px\" id=\"").concat(name, "@@@text\">").concat(name, "</text>");
         return arc;
     }
     var arcs = '<circle cx="50" cy="50" r="50" stroke="black" stroke-width="1px" fill="black" />';
@@ -95,10 +96,23 @@ function setGenres(movies) {
     document.getElementById("genre").innerHTML = genreText;
 }
 function arcClick(event) {
-    document.getElementById("currentMovie").innerText = event.target.id.split("@@@")[0]; //eventID;
+    currentMovie = defaultMovies.filter(function (movie) { return movie.name === event.target.id.split("@@@")[0]; })[0];
+    loadMovieEditor();
 }
 function spinClick() {
     document.getElementById("currentMovie").innerText = "Spinning!";
+}
+function loadMovieEditor() {
+    // @ts-ignore
+    document.getElementById("movieName").value = currentMovie.name;
+    // @ts-ignore
+    document.getElementById("runHours").value = Math.floor(currentMovie.runtime / 60);
+    // @ts-ignore
+    document.getElementById("runMinutes").value = currentMovie.runtime % 60;
+    // @ts-ignore
+    document.getElementById("genreInput").value = currentMovie.genres.join(" ");
+    // @ts-ignore
+    document.getElementById("linkInput").value = currentMovie.link;
 }
 function setup() {
     // @ts-ignore
@@ -116,6 +130,7 @@ function setup() {
     createSVGArcs(defaultMovies);
     document.getElementById("minTime").addEventListener("input", updateSliders);
     document.getElementById("maxTime").addEventListener("input", updateSliders);
+    loadMovieEditor();
 }
 function updateNumMovies(event) {
     defaultMovies = [];
@@ -151,4 +166,5 @@ var defaultMovies = [{
         genres: ["Drama", "Romance"],
         link: "https://www.netflix.com"
     }];
-setup();
+var currentMovie = defaultMovies[0];
+window.onload = setup;
