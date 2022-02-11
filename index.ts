@@ -25,7 +25,7 @@ function ensureLength(num: string | number, radix: number = 10, length: number =
 	}
 }
 
-function createSVGArcs(movies: movie[]): void {
+function createSVGArcs(): void {
 	function createSVGArc(arcNum: number, numArcs: number, name: string): string {
 		let arc: string;
 		let startAngle: number = (Math.PI * 2 / numArcs) * arcNum;
@@ -37,20 +37,23 @@ function createSVGArcs(movies: movie[]): void {
 fill="${hueToHex((startAngle + endAngle) / 2)}" stroke="black" stroke-width="1px" id="${name}" />`;
 		}
 		// TODO: Use `document.createElement()`, and a better formula for the font size
-		arc += `<text x="97" y="50" fill="white" stroke="black" stroke-width="0.1px" font-family="sans-serif" transform="rotate(${(startAngle + endAngle) * 90 / Math.PI} 50,50)" text-anchor="end" dominant-baseline="central" font-size="${25 / numArcs}px" id="${name}@@@text">${name}</text>`
+		let fontSize: number = 15 / Math.sqrt(numArcs);
+		arc += `<text font-weight="bolder" x="97" y="50" fill="white" stroke="black" stroke-width="0.1px" font-family="monospace" transform="rotate(${(startAngle + endAngle) * 90 / Math.PI} 50,50)" text-anchor="end" dominant-baseline="central" font-size="${Math.min(fontSize, 400 / fontSize / name.length)}px" id="${name}@@@text">${name}</text>`
 		return arc;
 	}
 
+	updateCurrentMovies();
+
 	let arcs: string = '<circle cx="50" cy="50" r="50" stroke="black" stroke-width="1px" fill="black" />';
-	for(let i = 0; i < movies.length; i++) {
-		arcs += createSVGArc(i, movies.length, movies[i].name);
+	for(let i = 0; i < currentMovies.length; i++) {
+		arcs += createSVGArc(i, currentMovies.length, currentMovies[i].name);
 	}
 	arcs += `<circle id="spinCirc" cx="50" cy="50" r="10" stroke="black" stroke-width="1px" fill="white"/>
 <text id="spinCirc@@@text" x="50" y="50" text-anchor="middle" dominant-baseline="central" font-size="8">Spin!</text>`;
 	document.getElementById("wheel").innerHTML = arcs;
-	for(let i = 0; i < movies.length; i++) {
-		document.getElementById(movies[i].name).addEventListener("click", arcClick);
-		document.getElementById(movies[i].name + "@@@text").addEventListener("click", arcClick);
+	for(let i = 0; i < currentMovies.length; i++) {
+		document.getElementById(currentMovies[i].name).addEventListener("click", arcClick);
+		document.getElementById(currentMovies[i].name + "@@@text").addEventListener("click", arcClick);
 	}
 	document.getElementById("spinCirc").addEventListener("click", spinClick);
 	document.getElementById("spinCirc@@@text").addEventListener("click", spinClick);
@@ -59,10 +62,12 @@ fill="${hueToHex((startAngle + endAngle) / 2)}" stroke="black" stroke-width="1px
 function updateSliders(event): void {
 	let thisVal: number = parseInt(event.target.value);
 	let timeString: string;
-	if(thisVal === 16) {
+	// @ts-ignore
+	const maxVal = parseInt(document.getElementById(event.target.id).max);
+	if(thisVal === maxVal) {
 		timeString = "∞h ∞m";
 	} else {
-		timeString = `${ensureLength(thisVal / 4, 10, 1)}h${ensureLength((thisVal % 4) * 15)}m`;
+		timeString = `${ensureLength(thisVal / (maxVal / maxHourSlider), 10, 1)}h${ensureLength((thisVal % (maxVal / maxHourSlider)) * timeIncrement)}m`;
 	}
 	if(event.target.id === "minTime") {
 		// @ts-ignore
@@ -85,9 +90,10 @@ function updateSliders(event): void {
 		}
 		document.getElementById("max").innerText = timeString;
 	}
+	createSVGArcs();
 }
 
-function setGenres(movies: movie[]): void {
+function setGenres(): void {
 	// @ts-ignore
 	let genres = new Set();
 	for(let movie of movies) {
@@ -97,18 +103,30 @@ function setGenres(movies: movie[]): void {
 	}
 	let genreText = '';
 	genres.forEach(genre => {
-		genreText += `<input type="checkbox" id="${genre}"><label for="example1">${genre}</label><br>`;
+		genreText += `<input type="checkbox" id="${genre}" onclick="createSVGArcs()"><label for="example1">${genre}</label><br>`;
 	})
 	document.getElementById("genre").innerHTML = genreText;
+	createSVGArcs();
 }
 
 function arcClick(event): void {
-	currentMovie = defaultMovies.filter(movie => {return movie.name === event.target.id.split("@@@")[0]})[0];
+	currentMovie = movies.filter(movie => {return movie.name === event.target.id.split("@@@")[0]})[0];
 	loadMovieEditor();
 }
 
 function spinClick(): void {
-	document.getElementById("currentMovie").innerText = "Spinning!";
+	const numDeg: number = (5 + Math.random() * 4) * 360;
+	for(let i = 0; i < numDeg; i++) {
+		let frac = i / numDeg;
+		setTimeout(() => {
+			//console.log(currentMovies, currentMovies.length * ((630 - i) % 360) / 360);
+			document.getElementById("wheel").style.transform = `rotate(${i}deg)`;
+			// @ts-ignore
+			currentMovie = currentMovies[parseInt(currentMovies.length * ((630 - (i % 360)) % 360) / 360)];
+			document.getElementById("currentMovie").innerText = currentMovie.name;
+			loadMovieEditor();
+		}, 1000 * i * (-1/(frac-1.2) - 5/6) * 0.25 / 360);
+	}
 }
 
 function loadMovieEditor(): void {
@@ -124,65 +142,190 @@ function loadMovieEditor(): void {
 	document.getElementById("linkInput").value = currentMovie.link;
 }
 
+async function getMovies() {
+	// @ts-ignore
+	if(document.getElementById("loadFromFile").files.length !== 0) {
+		// TODO: Allow uploading files
+		return [];
+	}
+	if(document.cookie !== "") {
+		return JSON.parse(document.cookie);
+	}
+	return fetch("defaultMovies.json",
+		{
+			method: "GET",
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+			},
+		}).then(response => response.json())
+		.then(json => {
+			return json;
+		});
+}
+
 function setup(): void {
+	getMovies().then(retMovies => {
+		movies = retMovies;
+		currentMovie = movies[0];
+		setGenres();
+		loadMovieEditor();
+		createSVGArcs();
+	});
+
 	// @ts-ignore
 	document.getElementById("minTime").value = 0;
 	// @ts-ignore
-	document.getElementById("maxTime").value = 16;
+	document.getElementById("minTime").max = maxHourSlider * (60 / timeIncrement);
+	// @ts-ignore
+	document.getElementById("maxTime").max = maxHourSlider * (60 / timeIncrement);
+	// @ts-ignore
+	document.getElementById("maxTime").value = maxHourSlider * (60 / timeIncrement);
 	// @ts-ignore
 	document.getElementById("include").checked = false;
 	// @ts-ignore
 	document.getElementById("exclude").checked = true;
 	// @ts-ignore
+	document.getElementById("include").addEventListener("click",createSVGArcs)
+	// @ts-ignore
+	document.getElementById("exclude").addEventListener("click",createSVGArcs)
+	// @ts-ignore
 	document.getElementById("numMovies").value = 0;
-
-	setGenres(defaultMovies);
-
 	document.getElementById("numMovies").addEventListener("input", updateNumMovies);
-	createSVGArcs(defaultMovies);
+
+	// @ts-ignore
+	document.getElementById("rotate").value = 0;
+	document.getElementById("rotate").addEventListener("input", rotate);
 
 	document.getElementById("minTime").addEventListener("input", updateSliders);
 	document.getElementById("maxTime").addEventListener("input", updateSliders);
 
-	loadMovieEditor();
+	document.getElementById("save").addEventListener("click", saveMovie);
+	document.getElementById("saveNew").addEventListener("click", saveNewMovie);
+	document.getElementById("delete").addEventListener("click", deleteMovie);
+}
+
+function rotate(event): void {
+	// @ts-ignore
+	let val = parseInt(event.target.value);
+	document.getElementById("wheel").style.transform = `rotate(${val}deg)`;
+	// @ts-ignore
+	console.log((630 - val) % 360, parseInt(currentMovies.length * ((630 - val) % 360) / 360));
 }
 
 function updateNumMovies(event): void {
-	defaultMovies = [];
+	movies = [];
 	for(let i = 0; i < event.target.value; i++) {
-		defaultMovies.push({name:`${i}`,runtime:i,genres:["1", `${i}`],link:""})
+		movies.push({name:`${i}`,runtime:i,genres:["1", `${i}`],link:""})
 	}
-	createSVGArcs(defaultMovies);
-	setGenres(defaultMovies);
+	currentMovie = movies[0];
+	setGenres();
+	createSVGArcs();
+	loadMovieEditor();
 }
 
-let defaultMovies: movie[] = [{
-	name: "Iron Man",
-	runtime: 126,
-	genres: ["Action", "Adventure", "Sci-Fi"],
-	link: "https://www.netflix.com"
-}, {
-	name: "Dune",
-	runtime: 155,
-	genres: ["Action", "Adventure", "Drama"],
-	link: "https://www.netflix.com"
-}, {
-	name: "The Matrix",
-	runtime: 136,
-	genres: ["Action", "Sci-Fi"],
-	link: "https://www.netflix.com"
-}, {
-	name: "12 Angry Men",
-	runtime: 96,
-	genres: ["Crime", "Drama"],
-	link: "https://www.netflix.com"
-}, {
-	name: "Titanic",
-	runtime: 194,
-	genres: ["Drama","Romance"],
-	link: "https://www.netflix.com"
-}];
+function updateCurrentMovies(): void {
+	let inGenre: string[] = [];
+	let exGenre: string[] = [];
+	document.querySelectorAll("input[type=checkbox]").forEach(genreCheck => {
+		// @ts-ignore
+		if(!genreCheck.checked) {
+			return;
+		}
+		// @ts-ignore
+		if(document.getElementById("exclude").checked) {
+			exGenre.push(genreCheck.id);
+		}
+		// @ts-ignore
+		if(document.getElementById("include").checked) {
+			inGenre.push(genreCheck.id);
+		}
+	});
+	// @ts-ignore
+	let minTime: number = document.getElementById("minTime").value * timeIncrement;
+	// @ts-ignore
+	if(document.getElementById("minTime").value === document.getElementById("minTime").max) {
+		minTime = Number.POSITIVE_INFINITY;
+	}
+	// @ts-ignore
+	let maxTime: number = document.getElementById("maxTime").value * timeIncrement;
+	// @ts-ignore
+	if(document.getElementById("maxTime").value === document.getElementById("maxTime").max) {
+		maxTime = Number.POSITIVE_INFINITY;
+	}
+	currentMovies = []
+	for(let movie of movies) {
+		let valid: boolean = inGenre.length === 0;
+		for(let genre of inGenre) {
+			if(movie.genres.indexOf(genre) !== -1) {
+				valid = true;
+				break;
+			}
+		}
+		for(let genre of movie.genres) {
+			if(exGenre.length != 0 && exGenre.indexOf(genre) !== -1) {
+				valid = false;
+				break;
+			}
+		}
+		if(minTime > movie.runtime || movie.runtime > maxTime) {
+			valid = false;
+		}
+		if(valid) {
+			currentMovies.push(movie);
+		}
+	}
+}
 
-let currentMovie = defaultMovies[0];
+function saveMovie(): void {
+	// @ts-ignore
+	currentMovie.name = document.getElementById("movieName").value;
+	// @ts-ignore
+	currentMovie.runtime = parseInt(document.getElementById("runHours").value) * 60 + parseInt(document.getElementById("runMinutes").value);
+	// @ts-ignore
+	currentMovie.genres = document.getElementById("genreInput").value.split(" ");
+	// @ts-ignore
+	currentMovie.link = document.getElementById("linkInput").value;
+	setGenres();
+	createSVGArcs();
+}
+
+function saveNewMovie(): void {
+	currentMovie = {
+		// @ts-ignore
+		name: document.getElementById("movieName").value,
+		// @ts-ignore
+		runtime: parseInt(document.getElementById("runHours").value) * 60 + parseInt(document.getElementById("runMinutes").value),
+		// @ts-ignore
+		genres: document.getElementById("genreInput").value.split(" "),
+		// @ts-ignore
+		link: document.getElementById("linkInput").value
+	};
+	movies.push(currentMovie);
+	setGenres();
+	createSVGArcs();
+}
+
+function deleteMovie(): void {
+	movies.splice(movies.indexOf(currentMovie), 1)
+	if(movies.length === 0) {
+		currentMovie = {
+			name: "",
+			runtime: 0,
+			genres: [],
+			link: ""
+		};
+	} else {
+		currentMovie = movies[0];
+	}
+	setGenres();
+	createSVGArcs();
+}
+
+let movies: movie[];
+let currentMovie: movie;
+let currentMovies: movie[];
+const maxHourSlider = 5;
+const timeIncrement = 5;
 
 window.onload = setup;

@@ -4,12 +4,13 @@
 	<meta charset="UTF-8">
 	<title>Movie Selector</title>
 	<link rel="stylesheet" href="index.css">
+	<link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>
 <h1>Movie Selector</h1>
 <div id="content">
 	<div id="svg-container">
-		<h2 id="currentMovie">No movie selected</h2>
+		<h2 id="currentMovie">Click "Spin!" to spin the wheel!</h2>
 		<svg viewBox="0 0 10 10" width="5%">
 			<polygon points="0,0 5,10 10,0" fill="white" />
 		</svg>
@@ -21,9 +22,9 @@
 		<h3>Select movie length</h3>
 		<div class="controlSection">
 			<label for="minTime">Minimum movie length: <span id="min" class="time">0h00m</span></label><br>
-			<input type="range" min="0" max="16" value="0" id="minTime"><br>
+			<input type="range" min="0" max="1" value="0" id="minTime"><br>
 			<label for="maxTime">Maximum movie length: <span id="max" class="time">∞h ∞m</span></label><br>
-			<input type="range" min="0" max="16" value="16" id="maxTime"><br>
+			<input type="range" min="0" max="1" value="1" id="maxTime"><br>
 		</div>
 		<h3>Select genres</h3>
 		<div class="controlSection">
@@ -48,13 +49,20 @@
 			<label for="linkInput">Link:</label><br>
 			<input type="text" id="linkInput"><br><br>
 			<button id="save">Save</button>
-			<button id="saveNew">Save as new</button>
+			<button id="saveNew">Save new</button>
+			<button id="delete">Delete</button>
 
 		</div>
 		<h3>Other</h3>
-		<div class="controlSection">
+		<div hidden class="controlSection">
+			<label for="rotate">Rotate</label><br>
+			<input type="range" min="0" max="359" value="0" id="rotate"><br>
 			<label for="numMovies">Number of movies</label><br>
-			<input type="range" min="0" max="30" value="0" id="numMovies"><br>
+			<input type="range" min="0" max="120" value="0" id="numMovies"><br>
+			<label for="saveToFile">Save to file:</label>
+			<input id="saveToFile" type="file"><br>
+			<label for="saveToFile">Load from file:</label>
+			<input id="loadFromFile" type="file">
 		</div>
 	</div>
 </div>
