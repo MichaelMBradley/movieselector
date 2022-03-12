@@ -38,7 +38,7 @@ fill="${hueToHex((startAngle + endAngle) / 2)}" stroke="black" stroke-width="1px
 		}
 		// TODO: Use `document.createElement()`, and a better formula for the font size
 		let fontSize: number = 15 / Math.sqrt(numArcs);
-		arc += `<text font-weight="bolder" x="97" y="50" fill="white" stroke="black" stroke-width="0.1px" font-family="monospace" transform="rotate(${(startAngle + endAngle) * 90 / Math.PI} 50,50)" text-anchor="end" dominant-baseline="central" font-size="${Math.min(fontSize, 400 / fontSize / name.length)}px" id="${name}@@@text">${name}</text>`
+		arc += `<text font-weight="bolder" x="97" y="50" fill="white" stroke="black" stroke-width="0.1px" font-family="monospace" transform="rotate(${(startAngle + endAngle) * 90 / Math.PI} 50,50)" text-anchor="end" dominant-baseline="central" font-size="${Math.min(fontSize, 60 / name.length)}px" id="${name}@@@text">${name}</text>`
 		return arc;
 	}
 
@@ -114,18 +114,23 @@ function arcClick(event): void {
 	loadMovieEditor();
 }
 
+function bezEaseOut(frac: number): number {
+	frac = 1 - frac;
+	return frac * (frac + 1 / frac);
+}
+
 function spinClick(): void {
 	const numDeg: number = (5 + Math.random() * 4) * 360;
 	for(let i = 0; i < numDeg; i++) {
-		let frac = i / numDeg;
 		setTimeout(() => {
+			let deg = bezEaseOut(i / numDeg) * numDeg;
 			//console.log(currentMovies, currentMovies.length * ((630 - i) % 360) / 360);
-			document.getElementById("wheel").style.transform = `rotate(${i}deg)`;
+			document.getElementById("wheel").style.transform = `rotate(${deg}deg)`;
 			// @ts-ignore
-			currentMovie = currentMovies[parseInt(currentMovies.length * ((630 - (i % 360)) % 360) / 360)];
+			currentMovie = currentMovies[parseInt(currentMovies.length * ((630 - (deg % 360)) % 360) / 360)];
 			document.getElementById("currentMovie").innerText = currentMovie.name;
 			loadMovieEditor();
-		}, 1000 * i * (-1/(frac-1.2) - 5/6) * 0.25 / 360);
+		}, i * 2);
 	}
 }
 

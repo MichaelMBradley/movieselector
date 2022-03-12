@@ -124,3 +124,8 @@ input[type=file] {
 	border-radius: 6px;
 	margin-bottom: 1em;
 }
+
+text {
+	cursor: pointer;
+	user-select: none;
+}

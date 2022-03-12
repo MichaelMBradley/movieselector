@@ -68,7 +68,7 @@ function createSVGArcs() {
         }
         // TODO: Use `document.createElement()`, and a better formula for the font size
         var fontSize = 15 / Math.sqrt(numArcs);
-        arc += "<text font-weight=\"bolder\" x=\"97\" y=\"50\" fill=\"white\" stroke=\"black\" stroke-width=\"0.1px\" font-family=\"monospace\" transform=\"rotate(".concat((startAngle + endAngle) * 90 / Math.PI, " 50,50)\" text-anchor=\"end\" dominant-baseline=\"central\" font-size=\"").concat(Math.min(fontSize, 400 / fontSize / name.length), "px\" id=\"").concat(name, "@@@text\">").concat(name, "</text>");
+        arc += "<text font-weight=\"bolder\" x=\"97\" y=\"50\" fill=\"white\" stroke=\"black\" stroke-width=\"0.1px\" font-family=\"monospace\" transform=\"rotate(".concat((startAngle + endAngle) * 90 / Math.PI, " 50,50)\" text-anchor=\"end\" dominant-baseline=\"central\" font-size=\"").concat(Math.min(fontSize, 60 / name.length), "px\" id=\"").concat(name, "@@@text\">").concat(name, "</text>");
         return arc;
     }
     updateCurrentMovies();
@@ -141,18 +141,22 @@ function arcClick(event) {
     currentMovie = movies.filter(function (movie) { return movie.name === event.target.id.split("@@@")[0]; })[0];
     loadMovieEditor();
 }
+function bezEaseOut(frac) {
+    frac = 1 - frac;
+    return frac * (frac + 1 / frac);
+}
 function spinClick() {
     var numDeg = (5 + Math.random() * 4) * 360;
     var _loop_1 = function (i) {
-        var frac = i / numDeg;
         setTimeout(function () {
+            var deg = bezEaseOut(i / numDeg) * numDeg;
             //console.log(currentMovies, currentMovies.length * ((630 - i) % 360) / 360);
-            document.getElementById("wheel").style.transform = "rotate(".concat(i, "deg)");
+            document.getElementById("wheel").style.transform = "rotate(".concat(deg, "deg)");
             // @ts-ignore
-            currentMovie = currentMovies[parseInt(currentMovies.length * ((630 - (i % 360)) % 360) / 360)];
+            currentMovie = currentMovies[parseInt(currentMovies.length * ((630 - (deg % 360)) % 360) / 360)];
             document.getElementById("currentMovie").innerText = currentMovie.name;
             loadMovieEditor();
-        }, 1000 * i * (-1 / (frac - 1.2) - 5 / 6) * 0.25 / 360);
+        }, i * 2);
     };
     for (var i = 0; i < numDeg; i++) {
         _loop_1(i);
