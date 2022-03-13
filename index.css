@@ -1,6 +1,12 @@
+:root {
+	--bg: #0540F2;
+	--menu: #056CF2;
+	--submenu: #0597F2;
+	--subsubmenu: #05C4F2;
+}
+
 html {
-	background-color: #503ab4;
-	background: linear-gradient(90deg, rgba(80,58,180,1) 0%, rgba(145,50,255,1) 50%, rgba(80,58,180,1) 100%);
+	background-color: var(--bg);
 }
 
 body {
@@ -38,7 +44,7 @@ div#svg-container {
 div#controls {
 	width: 70%;
 	height: 100%;
-	background-color: purple;
+	background-color: var(--menu);
 	border-radius: 1em;
 	display: inline-block;
 	vertical-align: top;
@@ -52,7 +58,7 @@ div.controlSection{
 	border-radius: 0.75em;
 	padding: 0.75em;
 	margin: 0.25em;
-	background-color: darkviolet;
+	background-color: var(--submenu);
 	display: block;
 }
 
@@ -62,7 +68,7 @@ div#genre {
 }
 
 span.time {
-	background-color: purple;
+	background-color: var(--subsubmenu);
 	padding: 2px;
 	border-radius: 3px;
 	font-family: monospace;
@@ -75,12 +81,12 @@ div::-webkit-scrollbar {
 }
 
 div::-webkit-scrollbar-track {
-	background-color: purple;
+	background-color: var(--menu);
 	border-radius: 1em;
 }
 
 div::-webkit-scrollbar-thumb {
-	background: darkviolet;
+	background: var(--submenu);
 	border-radius: 1em;
 }
 
@@ -119,7 +125,7 @@ input[type=number] {
 }
 
 input[type=file] {
-	background-color: deeppink;
+	background-color: var(--subsubmenu);
 	padding: 3px;
 	border-radius: 6px;
 	margin-bottom: 1em;
@@ -128,4 +134,11 @@ input[type=file] {
 text {
 	cursor: pointer;
 	user-select: none;
+}
+
+button.theme {
+	border-radius: 2em;
+	width: 2em;
+	height: 2em;
+	cursor: pointer;
 }

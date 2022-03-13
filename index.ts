@@ -5,6 +5,13 @@ interface movie {
 	link: string;
 }
 
+interface palette {
+	"--bg": string;
+	"--menu": string;
+	"--submenu": string;
+	"--subsubmenu": string;
+}
+
 // Assumes hue in radians, s=1, v=1
 function hueToHex(hue: number): string {
 	const cVal = (hue: number, offset: number) => {
@@ -156,7 +163,7 @@ async function getMovies() {
 	if(document.cookie !== "") {
 		return JSON.parse(document.cookie);
 	}
-	return fetch("defaultMovies.json",
+	return fetch("data/defaultMovies.json",
 		{
 			method: "GET",
 			headers: {
@@ -169,7 +176,43 @@ async function getMovies() {
 		});
 }
 
+function loadPalette(ind: number): void {
+	const root = document.querySelector(":root");
+	const theme = palettes[ind]
+	// @ts-ignore
+	Object.keys(theme).forEach(selector => { root.style.setProperty(selector, theme[selector]) })
+}
+
+function changePalette(event) {
+	loadPalette(parseInt(event.target.id.split("palette")[1]));
+}
+
+function setupThemeSelector(): void {
+	const themeDiv = document.getElementById("palette");
+	let paletteHTML = "";
+	for(let i = 0; i < palettes.length; i++) {
+		paletteHTML += `<button id="palette${i}" class="theme" style="background-color: ${palettes[i]["--bg"]}"></button>`;
+	}
+	themeDiv.innerHTML = paletteHTML;
+	for(let i = 0; i < palettes.length; i++) {
+		document.getElementById(`palette${i}`).addEventListener("click", changePalette);
+	}
+}
+
 function setup(): void {
+	fetch("data/cssThemes.json", {
+		method: "GET",
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json',
+		},
+	})
+		.then(response => response.json())
+		.then(cssThemes => {
+			palettes = cssThemes;
+			loadPalette(0);
+			setupThemeSelector();
+		});
 	getMovies().then(retMovies => {
 		movies = retMovies;
 		currentMovie = movies[0];
@@ -332,5 +375,6 @@ let currentMovie: movie;
 let currentMovies: movie[];
 const maxHourSlider = 5;
 const timeIncrement = 5;
+let palettes: palette[];
 
 window.onload = setup;

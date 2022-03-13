@@ -185,7 +185,7 @@ function getMovies() {
             if (document.cookie !== "") {
                 return [2 /*return*/, JSON.parse(document.cookie)];
             }
-            return [2 /*return*/, fetch("defaultMovies.json", {
+            return [2 /*return*/, fetch("data/defaultMovies.json", {
                     method: "GET",
                     headers: {
                         'Accept': 'application/json',
@@ -198,7 +198,40 @@ function getMovies() {
         });
     });
 }
+function loadPalette(ind) {
+    var root = document.querySelector(":root");
+    var theme = palettes[ind];
+    // @ts-ignore
+    Object.keys(theme).forEach(function (selector) { root.style.setProperty(selector, theme[selector]); });
+}
+function changePalette(event) {
+    loadPalette(parseInt(event.target.id.split("palette")[1]));
+}
+function setupThemeSelector() {
+    var themeDiv = document.getElementById("palette");
+    var paletteHTML = "";
+    for (var i = 0; i < palettes.length; i++) {
+        paletteHTML += "<button id=\"palette".concat(i, "\" class=\"theme\" style=\"background-color: ").concat(palettes[i]["--bg"], "\"></button>");
+    }
+    themeDiv.innerHTML = paletteHTML;
+    for (var i = 0; i < palettes.length; i++) {
+        document.getElementById("palette".concat(i)).addEventListener("click", changePalette);
+    }
+}
 function setup() {
+    fetch("data/cssThemes.json", {
+        method: "GET",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(function (response) { return response.json(); })
+        .then(function (cssThemes) {
+        palettes = cssThemes;
+        loadPalette(0);
+        setupThemeSelector();
+    });
     getMovies().then(function (retMovies) {
         movies = retMovies;
         currentMovie = movies[0];
@@ -354,4 +387,5 @@ var currentMovie;
 var currentMovies;
 var maxHourSlider = 5;
 var timeIncrement = 5;
+var palettes;
 window.onload = setup;
